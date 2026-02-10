@@ -267,7 +267,20 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
     if not isinstance(dd, Iterable):
         # No idea what to draw.
         return []
-
+    # FIX #594: len(dd)==1 is true for 1-point scatter too.
+    # Only treat as contour if the single offset is a dummy near (0,0).
+    is_contour = False
+    if isinstance(dd, Sized) and len(dd) == 1:
+        try:
+            offsets = np.asarray(dd, dtype=float)
+            is_contour = (
+                    offsets.ndim == 2
+                    and offsets.shape[0] == 1
+                    and offsets.shape[1] >= 2
+                    and np.allclose(offsets[0, :2], [0.0, 0.0], atol=1e-12, rtol=0.0)
+            )
+        except Exception:
+            is_contour = False
     path_collection_data = PathCollectionData(
         obj=obj,
         dd_strings=np.array(
@@ -280,7 +293,8 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
         draw_options=["only marks"],
         labels=["x", "y"],
         table_options=[],
-        is_contour=isinstance(dd, Sized) and len(dd) == 1,
+        #is_contour=isinstance(dd, Sized) and len(dd) == 1,
+        is_contour=is_contour #use the correct is_contour
     )
     line_data = LineData(obj=obj)
 
@@ -299,10 +313,15 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
 
     _draw_pathcollection_drawoptions(data, path_collection_data, line_data)
 
-    for path in obj.get_paths():
-        _draw_pathcollection_draw_contour(path, data, path_collection_data)
-        _draw_pathcollection_scatter_sizes(data, path_collection_data)
+    # For contours, iterate the actual contour paths and let the contour helper
+    # replace the point table. For scatter markers, emit exactly one plot using
+    # offsets and avoid treating marker geometry as contour paths.
+    paths = obj.get_paths() if path_collection_data.is_contour else [None]
 
+    for path in paths:
+        if path is not None:
+            _draw_pathcollection_draw_contour(path, data, path_collection_data)
+        _draw_pathcollection_scatter_sizes(data, path_collection_data)
         # remove duplicates
         draw_options = sorted(set(path_collection_data.draw_options))
 
