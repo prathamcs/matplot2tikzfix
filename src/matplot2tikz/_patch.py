@@ -110,7 +110,17 @@ def draw_patchcollection(data: TikzData, obj: Collection) -> list[str]:
     lws = ensure_list(obj.get_linewidth())
     ts = ensure_list(obj.get_transforms())
     offs_tmp = obj.get_offsets()
-    offs = offs_tmp if isinstance(offs_tmp, Iterable) else [offs_tmp]
+    import numpy as np
+    offsets = np.asarray(offs_tmp)
+
+    if offsets.ndim == 1:
+        offsets = offsets.reshape(1, 2)
+
+    if offsets.size == 0 or offsets.shape[0] == 0:
+        return  # nothing to draw
+
+    #offs = offs_tmp if isinstance(offs_tmp, Iterable) else [offs_tmp]
+    offs=offsets.tolist()
     hatches = ensure_list(obj.get_hatch()) if obj.get_hatch() is not None else [None]
 
     paths = obj.get_paths()
