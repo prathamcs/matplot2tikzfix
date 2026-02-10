@@ -19,10 +19,13 @@ def draw_legend(data: TikzData, obj: Legend) -> None:
 
     legend_style = [
         # https://github.com/matplotlib/matplotlib/issues/15764#issuecomment-557823370
-        f"fill opacity={obj.get_frame().get_alpha()}",
+        #f"fill opacity={obj.get_frame().get_alpha()}",
         "draw opacity=1",
         "text opacity=1",
     ]
+    alpha = obj.get_frame().get_alpha()
+    if alpha is not None:
+        legend_style.insert(0, f"fill opacity={alpha}")
     _legend_position_anchor(data, obj, legend_style)
     _legend_edgecolor(data, obj, legend_style)
     _legend_facecolor(data, obj, legend_style)
