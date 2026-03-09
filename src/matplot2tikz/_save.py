@@ -388,12 +388,15 @@ def _draw_collection(data: TikzData, child: Collection) -> list[str]:
 
 
 def _set_default_axis_dimensions_from_figure(data: TikzData, fig: Figure) -> None:
-    """Set axis width/height from figure size (in) when both unset and one non-colorbar axis."""
+    """Set axis width/height from figure size (in) when both unset and one axis.
+
+    Handles both: (1) one non-colorbar axis, (2) one colorbar-only axis.
+    """
     if data.axis_width is not None or data.axis_height is not None:
         return
-    non_cb_axes = [a for a in fig.axes if not _axes.is_colorbar_heuristic(a)]
-    if len(non_cb_axes) != 1:
+    if len(fig.axes) != 1:
         return
+    # Single axis: either a normal plot or a standalone colorbar
     data.axis_width = f"{fig.get_figwidth():{data.float_format}}in"
     data.axis_height = f"{fig.get_figheight():{data.float_format}}in"
 
@@ -458,12 +461,23 @@ def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:
     ax = _axes.MyAxes(data, obj)
 
     if ax.is_colorbar:
-        return
+        # Standalone colorbar (figure has only this axes) is processed in MyAxes
+        fig = obj.figure
+        is_standalone = (
+            fig is not None and len(fig.axes) == 1 and fig.axes[0] is obj
+        )
+        if not is_standalone:
+            return
 
     data.current_mpl_axes = obj
 
     # Run through the child objects, gather the content.
-    children_content = _recurse(data, obj)
+    # For standalone colorbar, skip recursion - PGFPlots draws the colorbar from
+    # axis options alone, no \addplot needed.
+    if ax.is_colorbar:
+        children_content = []
+    else:
+        children_content = _recurse(data, obj)
 
     fig = obj.figure
     if fig is not None and obj == fig.axes[0]:

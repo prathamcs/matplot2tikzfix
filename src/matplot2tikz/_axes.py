@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Subplot
+from matplotlib.colorbar import Colorbar
 from matplotlib.colors import Colormap, LinearSegmentedColormap, ListedColormap
 
 from . import _color
@@ -14,7 +15,6 @@ from ._util import _common_texification
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from matplotlib.colorbar import Colorbar
 
     from ._tikzdata import TikzData
 
@@ -27,9 +27,14 @@ class MyAxes:
         self.content: list[str] = []
 
         # Are we dealing with an axis that hosts a colorbar? Skip then, those are
-        # treated implicitily by the associated axis.
+        # treated implicitily by the associated axis. Exception: standalone colorbar
+        # (figure has only this axes) must be processed.
         self.is_colorbar = _is_colorbar_heuristic(obj)
         if self.is_colorbar:
+            if not _is_standalone_colorbar_figure(obj):
+                return
+            # Standalone colorbar: run reduced setup
+            self._setup_standalone_colorbar()
             return
 
         # instantiation
@@ -54,6 +59,30 @@ class MyAxes:
         self._set_grid()
         self._set_axis_line_styles()
         self._set_background_color()
+        self._set_colorbar()
+        self._content_end()
+
+    def _setup_standalone_colorbar(self) -> None:
+        """Reduced setup for a figure that contains only a colorbar (no main plot)."""
+        self.nsubplots = 1
+        self.subplot_index = 0
+        self.is_subplot = False
+
+        colorbar = _find_colorbar_for_axes(self.obj)
+        if not colorbar:
+            return
+
+        self.data.current_axis_options = set()
+
+        xlim, ylim = self._set_axis_limits()
+
+        # Hide the axis box, ticks, and labels completely. The colorbar draws its
+        # own ticks and label via colorbar style.
+        self.data.current_axis_options.add("axis line style={draw=none}")
+        self.data.current_axis_options.add("hide x axis")
+        self.data.current_axis_options.add("hide y axis")
+
+        self._set_axis_dimensions(None, xlim, ylim)
         self._set_colorbar()
         self._content_end()
 
@@ -256,7 +285,7 @@ class MyAxes:
             self.data.current_axis_options.add(f"axis background/.style={{fill={col}}}")
 
     def _set_colorbar(self) -> None:
-        colorbar = _find_associated_colorbar(self.obj)
+        colorbar = _find_colorbar_for_axes(self.obj)
         if not colorbar:
             return
 
@@ -290,6 +319,10 @@ class MyAxes:
             colorbar_styles.extend(
                 _get_ticks(self.data, "minor x", colorbar_ticks_minor, colorbar_ticklabels_minor)
             )
+            # Horizontal colorbar label is on the x-axis
+            colorbar_xlabel = colorbar.ax.get_xlabel()
+            if colorbar_xlabel:
+                colorbar_styles.append("xlabel={" + _common_texification(colorbar_xlabel) + "}")
 
         elif orientation == "vertical":
             self.data.current_axis_options.add("colorbar")
@@ -903,6 +936,36 @@ def _gcd(a: float, b: float) -> float:
 def _linear_interpolation(x: float, a: tuple[float, float], b: tuple[float, float]) -> float:
     """Given two data points [a,b], linearly interpolate those at x."""
     return (b[1] * (x - a[0]) + b[0] * (a[1] - x)) / (a[1] - a[0])
+
+
+def _is_standalone_colorbar_figure(obj: Axes) -> bool:
+    """True if figure has only one axes and it is this one (colorbar-only figure)."""
+    fig = obj.figure
+    if fig is None:
+        return False
+    return len(fig.axes) == 1 and fig.axes[0] is obj
+
+
+def _find_colorbar_for_axes(axes: Axes) -> Colorbar | None:
+    """Find Colorbar that uses this axes (works for cax=ax standalone case)."""
+    cbar = _find_associated_colorbar(axes)
+    if cbar is not None:
+        return cbar
+    # When using cax=ax, Colorbar is stored on the axes as _colorbar
+    cbar = getattr(axes, "_colorbar", None)
+    if isinstance(cbar, Colorbar) and getattr(cbar, "ax", None) is axes:
+        return cbar
+    # Fallback: search axes and figure children
+    for child in axes.get_children():
+        if isinstance(child, Colorbar) and getattr(child, "ax", None) is axes:
+            return child
+    fig = axes.figure
+    if fig is None:
+        return None
+    for child in fig.get_children():
+        if isinstance(child, Colorbar) and getattr(child, "ax", None) is axes:
+            return child
+    return None
 
 
 def _find_associated_colorbar(obj: Axes) -> Colorbar | None:
