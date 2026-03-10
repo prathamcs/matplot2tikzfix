@@ -13,7 +13,7 @@ from . import _color as mycol
 from . import _files
 from . import _path as mypath
 from ._markers import _mpl_marker2pgfp_marker
-from ._util import get_legend_text, has_legend, transform_to_data_coordinates
+from ._util import _common_texification, get_legend_text, has_legend, transform_to_data_coordinates
 
 if TYPE_CHECKING:
     from matplotlib.collections import LineCollection
@@ -88,7 +88,8 @@ def draw_line2d(data: TikzData, obj: Line2D) -> list[str]:
     content += _table(data, obj)
 
     if legend_text is not None and primitive_legend is not None:
-        content.append(f"\\addlegendentry{{{legend_text}}}\n")
+        safe_legend_text = _common_texification(legend_text)
+        content.append(f"\\addlegendentry{{{safe_legend_text}}}\n")
     elif legend_text is not None and primitive_legend is None:
         content.append(f"\\label{{{legend_text + '_plot'}}}\n")
 
@@ -198,7 +199,7 @@ def _marker(
     addplot_options.append("mark=" + marker_data.marker)
 
     _marker_size(data, obj, addplot_options)
-    _marker_every(obj, addplot_options)
+    _marker_every(data, obj, addplot_options)
     _marker_options(data, marker_data, addplot_options)
 
 
@@ -211,7 +212,7 @@ def _marker_size(data: TikzData, obj: Line2D, addplot_options: list[str]) -> Non
         addplot_options.append(f"mark size={pgf_size:{ff}}")
 
 
-def _marker_every(obj: Line2D, addplot_options: list[str]) -> None:
+def _marker_every(data: TikzData, obj: Line2D, addplot_options: list[str]) -> None:
     mark_every = obj.get_markevery()
     if mark_every:
         if isinstance(mark_every, (int, float)):
@@ -222,7 +223,8 @@ def _marker_every(obj: Line2D, addplot_options: list[str]) -> None:
             # python starts at index 0, pgfplots at index 1
             pgf_marker = [1 + m for m in mark_every]
             addplot_options.append("mark indices = {" + ", ".join(map(str, pgf_marker)) + "}")
-
+            if obj.axes is not None and obj.axes.get_legend() is not None:
+                data.current_axis_options.add("legend image post style={mark indices={}}")
 
 def _marker_options(data: TikzData, marker_data: MarkerData, addplot_options: list[str]) -> None:
     mark_options = ["solid"]
