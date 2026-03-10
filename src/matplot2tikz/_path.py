@@ -252,7 +252,7 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
         else:
             content.append("table{")
 
-        #linter fix, reducing statements
+        # linter fix, reducing statements
 
         plot_table = [
             "  ".join(path_collection_data.labels) + "\n",
