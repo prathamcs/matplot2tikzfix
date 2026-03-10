@@ -17,19 +17,7 @@ def draw_legend(data: TikzData, obj: Legend) -> None:
         texts.append(f"{text.get_text()}")
         children_alignment.append(f"{text.get_horizontalalignment()}")
 
-    legend_style = [
-        # https://github.com/matplotlib/matplotlib/issues/15764#issuecomment-557823370
-        "draw opacity=1",
-        "text opacity=1",
-    ]
-
-    alpha = obj.get_frame().get_alpha()
-    if alpha is not None:
-        legend_style.insert(0, f"fill opacity={alpha}")
-
-    _legend_position_anchor(data, obj, legend_style)
-    _legend_edgecolor(data, obj, legend_style)
-    _legend_facecolor(data, obj, legend_style)
+    legend_style = build_legend_style(data, obj)
 
     # Get the horizontal alignment
     try:
@@ -67,6 +55,26 @@ def draw_legend(data: TikzData, obj: Legend) -> None:
         string = j1.join(legend_style)
         style = f"legend style={{{j0}{string}{j2}}}"
         data.current_axis_options.add(style)
+
+
+def build_legend_style(data: TikzData, obj: Legend) -> list[str]:
+    legend_style = [
+        "draw opacity=1",
+        "text opacity=1",
+    ]
+
+    frame_on = obj.get_frame_on()
+    if frame_on:
+        alpha = obj.get_frame().get_alpha()
+        if alpha is not None:
+            legend_style.insert(0, f"fill opacity={alpha}")
+    else:
+        legend_style.append("fill opacity=0, fill=none")
+
+    _legend_position_anchor(data, obj, legend_style)
+    _legend_edgecolor(data, obj, legend_style)
+    _legend_facecolor(data, obj, legend_style)
+    return legend_style
 
 
 def _legend_position_anchor(data: TikzData, obj: Legend, legend_style: list[str]) -> None:
