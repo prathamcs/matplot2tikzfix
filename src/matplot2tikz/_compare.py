@@ -1,10 +1,10 @@
 import shutil
 import subprocess
 import tempfile
+import webbrowser
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 from ._save import get_tikz_code
 
@@ -14,8 +14,7 @@ def compare(figure):
     Compare the matplotlib figure with the rendered TikZ code.
 
     This function generates the TikZ code for the given matplotlib figure,
-    compiles it using pdflatex, converts the PDF to a PNG image, and
-    displays it alongside the original matplotlib figure.
+    compiles it using pdflatex, and creates a side-by-side PDF comparison.
 
     :param figure: The matplotlib figure to process.
     """
@@ -32,26 +31,39 @@ def compare(figure):
     # Create a temporary directory to show the image
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
-        tex_file = temp_path / "figure.tex"
-        pdf_file = temp_path / "figure.pdf"
-        png_file = temp_path / "figure.png"
+        
+        # TikZ file paths
+        tikz_tex_file = temp_path / "tikz_figure.tex"
+        tikz_pdf_file = temp_path / "tikz_figure.pdf"
 
-        # Step 1: Get the TikZ code
-        tex_code = get_tikz_code(figure, standalone=True)
+        # Matplotlib file paths
+        mpl_pdf_file = temp_path / "mpl_figure.pdf"
 
-        # Step 2: Write it to a file
-        with open(tex_file, "w", encoding="utf-8") as f:
-            f.write(tex_code)
+        # Source PDF Generation
+        mpl_success = False
+        tikz_success = False
 
-        # Step 3: Compile with pdflatex
+        # Step 1: Save original Matplotlib figure to PDF
         try:
+            figure.savefig(mpl_pdf_file, format="pdf")
+            plt.close(figure)
+            mpl_success = True
+        except Exception as e:
+            print(f"Error saving matplotlib figure to PDF: {e}")
+
+        # Step 2: Generate TikZ Code and Compile
+        try:
+            tex_code = get_tikz_code(figure, standalone=True)
+            with open(tikz_tex_file, "w", encoding="utf-8") as f:
+                f.write(tex_code)
+
             cmd = [
                 pdflatex_path,
                 "-interaction=nonstopmode",
                 "-halt-on-error",
                 "-output-directory",
                 str(temp_path),
-                str(tex_file),
+                str(tikz_tex_file),
             ]
             
             subprocess.run(
@@ -60,33 +72,84 @@ def compare(figure):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE
             )
-            
-            # Step 4: Convert PDF to PNG (using helper)
-            if _convert_to_png(pdf_file, png_file):
-                # Display the image
-                if png_file.exists():
-                    img = mpimg.imread(str(png_file))
-                    
-                    # Create a new figure for the rendered output
-                    plt.imshow(img)
-                    plt.axis('off')
-                    plt.title("Rendered TikZ Output")
-                    
-                    plt.show()
-                else:
-                    print(f"Error: PNG file not found at {png_file}")
-            else:
-                print("Error: Conversion to PNG failed.")
-                print("Please install pdftocairo (part of Poppler).")
+            tikz_success = True
 
         except subprocess.CalledProcessError as e:
-            print("Error during processing:")
+            print("Error during TikZ compilation:")
             if e.stderr:
                 print(e.stderr.decode(errors="replace"))
             else:
                 print("Process failed with no stderr output.")
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+            print(f"An unexpected error occurred during TikZ generation: {e}")
+
+        # Step 3: Create Comparison PDF
+        if mpl_success and tikz_success:
+            comparison_tex = temp_path / "comparison.tex"
+            with open(comparison_tex, "w", encoding="utf-8") as f:
+                f.write(_get_comparison_tex_template(mpl_pdf_file, tikz_pdf_file))
+            
+            try:
+                subprocess.run(
+                   [
+                        pdflatex_path,
+                        "-interaction=nonstopmode",
+                        "-halt-on-error",
+                        "-output-directory",
+                        str(temp_path),
+                        str(comparison_tex),
+                    ],
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE
+                )
+                
+                # Move result to current directory and open
+                result_pdf = temp_path / "comparison.pdf"
+                if result_pdf.exists():
+                    dest_pdf = Path.cwd() / "matplot2tikz_comparison.pdf"
+                    shutil.copy(result_pdf, dest_pdf)
+                    print(f"Comparison PDF generated: {dest_pdf}")
+                    webbrowser.open(str(dest_pdf))
+                else:
+                    print("Error: Comparison PDF was not generated.")
+
+            except subprocess.CalledProcessError as e:
+                print("Error during comparison PDF compilation:")
+                if e.stderr:
+                    print(e.stderr.decode(errors="replace"))
+        else:
+            print("Skipping comparison PDF generation due to missing source files.")
+
+
+def _get_comparison_tex_template(mpl_path, tikz_path):
+    # Escape Windows paths for LaTeX
+    mpl_path_str = str(mpl_path).replace("\\", "/")
+    tikz_path_str = str(tikz_path).replace("\\", "/")
+    
+    return f"""\\documentclass[landscape]{{article}}
+\\usepackage{{graphicx}}
+\\usepackage{{geometry}}
+\\geometry{{margin=1cm}}
+\\usepackage{{caption}}
+
+\\begin{{document}}
+    \\begin{{figure}}[h]
+        \\centering
+        \\begin{{minipage}}{{0.48\\textwidth}}
+            \\centering
+            \\includegraphics[width=\\linewidth]{{{mpl_path_str}}}
+            \\caption*{{Matplotlib Output}}
+        \\end{{minipage}}
+        \\hfill
+        \\begin{{minipage}}{{0.48\\textwidth}}
+            \\centering
+            \\includegraphics[width=\\linewidth]{{{tikz_path_str}}}
+            \\caption*{{TikZ Output}}
+        \\end{{minipage}}
+    \\end{{figure}}
+\\end{{document}}
+"""
 
 
 def _convert_to_png(pdf_path, png_path):
