@@ -23,8 +23,8 @@ ytick style={color=black}
   \endscope
 },
   scatter/@pre marker code/.code={%
-  \scope[draw=black, fill=none]%
-  \pgfset{/tikz/mark size=\perpointmarksize}%
+  \scope[draw=black, fill=none, line width=3.0pt]%
+  \pgfset{/tikz/mark size=\perpointmarksize pt}%
 },
   visualization depends on={\thisrow{sizedata} \as\perpointmarksize}
 ]
