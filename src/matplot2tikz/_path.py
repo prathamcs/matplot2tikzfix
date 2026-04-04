@@ -561,7 +561,7 @@ def _build_scatter_marker_code_with_colors(  # noqa: PLR0913
 
 def _draw_pathcollection_scatter_sizes(data: TikzData, pcd: PathCollectionData) -> None:
     sizes = pcd.obj.get_sizes()
-    linewidths = pcd.obj.get_linewidths()
+    linewidths = pcd.obj.get_linewidths()  # type: ignore[attr-defined]
     n_sizes = len(sizes)
     n_linewidths = len(linewidths)
     n_points = len(pcd.dd_strings)
