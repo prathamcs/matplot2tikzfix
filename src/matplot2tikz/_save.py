@@ -457,6 +457,19 @@ def _recurse(data: TikzData, obj: Artist) -> list:
     return content.flatten()
 
 
+def _legend_title_content(data: TikzData, obj: Axes) -> list[str]:
+    legend = obj.get_legend()
+    if legend is None:
+        return []
+    title = legend.get_title().get_text()
+    if not title:
+        return []
+    return [
+        "\\addlegendimage{empty legend}\n",
+        f"\\addlegendentry{{\\hspace{{{data.legend_title_hspace}}}\\textbf{{{title}}}}}\n",
+    ]
+
+
 def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:
     ax = _axes.MyAxes(data, obj)
 
@@ -466,17 +479,7 @@ def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:
     data.current_mpl_axes = obj
 
     # Run through the child objects, gather the content.
-    children_content = _recurse(data, obj)
-    # Inject legend title 
-    legend = obj.get_legend()
-    if legend is not None:
-        title = legend.get_title().get_text()
-        if title:
-            title_content = [
-                "\\addlegendimage{empty legend}\n",
-                f"\\addlegendentry{{\\hspace{{-0.6cm}}\\textbf{{{title}}}}}\n"
-            ]
-            children_content = title_content + children_content
+    children_content = _legend_title_content(data, obj) + _recurse(data, obj)
 
     fig = obj.figure
     if fig is not None and obj == fig.axes[0]:
