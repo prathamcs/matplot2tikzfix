@@ -53,6 +53,8 @@ class TikzData:
 
     current_mpl_axes: Axes | None = None
 
+    legend_title_hspace: str = "-.6cm"
+
 
 class Flavors(enum.Enum):
     latex = (

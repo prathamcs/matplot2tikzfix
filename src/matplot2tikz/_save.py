@@ -63,6 +63,7 @@ class TikzArgs(TypedDict):
     float_format: NotRequired[str]
     table_row_sep: NotRequired[str]
     flavor: NotRequired[str]
+    legend_title_hspace: NotRequired[str]
 
 
 def get_tikz_code(  # noqa: PLR0913
@@ -89,6 +90,7 @@ def get_tikz_code(  # noqa: PLR0913
     float_format: str = ".15g",
     table_row_sep: str = "\n",
     flavor: str = "latex",
+    legend_title_hspace: str = "-.6cm",
 ) -> str:
     r"""Main function that converts a matplotlib Figure to tikz.
 
@@ -226,6 +228,7 @@ def get_tikz_code(  # noqa: PLR0913
         data.extra_groupstyle_options = set(extra_groupstyle_parameters)
     data.float_format = float_format
     data.table_row_sep = table_row_sep
+    data.legend_title_hspace = legend_title_hspace
     if extra_tikzpicture_parameters:
         data.extra_tikzpicture_parameters = set(extra_tikzpicture_parameters)
     if extra_lines_start:
@@ -464,6 +467,16 @@ def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:
 
     # Run through the child objects, gather the content.
     children_content = _recurse(data, obj)
+    # Inject legend title 
+    legend = obj.get_legend()
+    if legend is not None:
+        title = legend.get_title().get_text()
+        if title:
+            title_content = [
+                "\\addlegendimage{empty legend}\n",
+                f"\\addlegendentry{{\\hspace{{-0.6cm}}\\textbf{{{title}}}}}\n"
+            ]
+            children_content = title_content + children_content
 
     fig = obj.figure
     if fig is not None and obj == fig.axes[0]:
