@@ -17,7 +17,7 @@ def plot() -> Figure:
     # Basic continuous colorbar - figure has only the colorbar axes
     fig, ax = plt.subplots(figsize=(6, 1), layout="constrained")
 
-    cmap = mpl.cm.cool
+    cmap = mpl.colormaps["cool"]
     norm = mpl.colors.Normalize(vmin=5, vmax=10)
 
     fig.colorbar(
