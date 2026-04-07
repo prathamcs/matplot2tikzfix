@@ -301,7 +301,7 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
 
     for path in obj.get_paths():
         _draw_pathcollection_draw_contour(path, data, path_collection_data)
-        _draw_pathcollection_scatter_sizes(path_collection_data)
+        _draw_pathcollection_scatter_sizes(data, path_collection_data)
 
         # remove duplicates
         draw_options = sorted(set(path_collection_data.draw_options))
@@ -367,6 +367,9 @@ def _draw_pathcollection_scatter_colormap(data: TikzData, pcd: PathCollectionDat
                 pcd.draw_options.append(
                     f"scatter/use mapped color={{draw={ec_name},fill=mapped color}}"
                 )
+    alpha = pcd.obj.get_alpha()
+    if alpha is not None and alpha < 1.0:
+        pcd.draw_options.append(f"opacity={alpha:{data.float_format}}")
 
 
 def _draw_pathcollection_get_edgecolors(
@@ -498,20 +501,122 @@ def _draw_pathcollection_draw_contour(path: Path, data: TikzData, pcd: PathColle
         pcd.dd_strings = np.array(dd_strings[1:], dtype=object)
 
 
-def _draw_pathcollection_scatter_sizes(pcd: PathCollectionData) -> None:
-    if len(pcd.obj.get_sizes()) == len(pcd.dd_strings):
-        # See Pgfplots manual, chapter 4.25.
-        # In Pgfplots, \mark size specifies radii, in matplotlib circle areas.
-        radii = np.sqrt(pcd.obj.get_sizes() / np.pi)
-        pcd.dd_strings = np.column_stack([pcd.dd_strings, radii])
-        pcd.labels.append("sizedata")
-        pcd.draw_options.extend(
-            [
-                "visualization depends on=" + "{\\thisrow{sizedata} \\as\\perpointmarksize}",
-                "scatter",
-                "scatter/@pre marker code/.append style={/tikz/mark size=\\perpointmarksize}",
-            ]
+def _build_scatter_marker_code_no_colors(
+    has_variable_sizes: bool,  # noqa: FBT001
+    has_variable_linewidths: bool,  # noqa: FBT001
+) -> str | None:
+    """Build fallback scatter/@pre marker code when no uniform colors."""
+    if has_variable_sizes and not has_variable_linewidths:
+        return "scatter/@pre marker code/.append style={/tikz/mark size=\\perpointmarksize}"
+    if has_variable_linewidths:
+        size_mark_str = "\\perpointmarksize pt" if has_variable_sizes else "\\perpointmarksize"
+        return (
+            f"scatter/@pre marker code/.code={{%\n"
+            f"  \\pgfsetlinewidth{{\\perpointlinewidth pt}}%\n"
+            f"  \\pgfset{{/tikz/mark size={size_mark_str}}}%\n"
+            f"}}"
         )
+    return None
+
+
+def _build_scatter_marker_code_with_colors(  # noqa: PLR0913
+    data: TikzData,
+    pcd: PathCollectionData,
+    linewidths: np.ndarray,
+    has_variable_sizes: bool,  # noqa: FBT001
+    has_variable_linewidths: bool,  # noqa: FBT001
+    n_linewidths: int,
+) -> list[str] | None:
+    """Build scatter/@pre/@post marker code when uniform colors are present."""
+    edgecolors = pcd.obj.get_edgecolors()  # type: ignore[attr-defined]
+    facecolors = pcd.obj.get_facecolors()  # type: ignore[attr-defined]
+    if len(edgecolors) != 1 or len(facecolors) > 1:
+        return None
+
+    ec_name, _ = _color.mpl_color2xcolor(data, edgecolors[0])
+    if len(facecolors) == 0 or facecolors[0][3] == 0:
+        fc_part = "none"
+    else:
+        fc_part = _color.mpl_color2xcolor(data, facecolors[0])[0]
+
+    pre_code_lines = []
+    if has_variable_linewidths:
+        pre_code_lines.append("  \\pgfsetlinewidth{\\perpointlinewidth pt}%\n")
+
+    size_mark_size = "\\perpointmarksize pt" if has_variable_sizes else "\\perpointmarksize"
+    scope_attrs = f"draw={ec_name}, fill={fc_part}"
+    if n_linewidths == 1:  # uniform linewidth
+        lw = float(linewidths[0])
+        scope_attrs += f", line width={lw}pt"
+
+    pre_code_lines.append(f"  \\scope[{scope_attrs}]%\n")
+    pre_code_lines.append(f"  \\pgfset{{/tikz/mark size={size_mark_size}}}%\n")
+
+    pre_code = "".join(pre_code_lines)
+    return [
+        f"scatter/@pre marker code/.code={{%\n{pre_code}}}",
+        "scatter/@post marker code/.code={%\n  \\endscope\n}",
+    ]
+
+
+def _draw_pathcollection_scatter_sizes(data: TikzData, pcd: PathCollectionData) -> None:
+    sizes = pcd.obj.get_sizes()
+    linewidths = pcd.obj.get_linewidths()  # type: ignore[attr-defined]
+    n_sizes = len(sizes)
+    n_linewidths = len(linewidths)
+    n_points = len(pcd.dd_strings)
+
+    if n_points in (n_sizes, n_linewidths):
+        # Variable sizes and/or linewidths
+        size_options = ["scatter"]
+        has_variable_sizes = n_sizes == n_points
+        has_variable_linewidths = n_linewidths == n_points
+
+        if has_variable_sizes:
+            # In Pgfplots, \mark size specifies radii, in matplotlib circle areas.
+            radii = np.sqrt(pcd.obj.get_sizes() / np.pi)
+            pcd.dd_strings = np.column_stack([pcd.dd_strings, radii])
+            pcd.labels.append("sizedata")
+            size_options.insert(
+                0, "visualization depends on=" + "{\\thisrow{sizedata} \\as\\perpointmarksize}"
+            )
+
+        if has_variable_linewidths:
+            pcd.dd_strings = np.column_stack([pcd.dd_strings, linewidths])
+            pcd.labels.append("lwdata")
+            size_options.insert(
+                0, "visualization depends on={\\thisrow{lwdata} \\as\\perpointlinewidth}"
+            )
+
+        # When scatter mode is active, top-level draw=/fill= options are ignored by pgfplots.
+        # If uniform colors are present, use .code with \scope to embed alongside size/linewidth.
+        if not pcd.add_individual_color_code and pcd.obj.get_array() is None:
+            marker_code = _build_scatter_marker_code_with_colors(
+                data,
+                pcd,
+                linewidths,
+                has_variable_sizes,
+                has_variable_linewidths,
+                n_linewidths,
+            )
+            if marker_code is not None:
+                size_options.extend(marker_code)
+                pcd.draw_options.extend(size_options)
+                return
+
+        pcd.draw_options.extend(size_options)
+        fallback_code = _build_scatter_marker_code_no_colors(
+            has_variable_sizes, has_variable_linewidths
+        )
+        if fallback_code is not None:
+            pcd.draw_options.append(fallback_code)
+    elif n_sizes > 0:
+        # Uniform size (scalar s=... or all same) - use fixed mark size
+        # When s=300 is passed, get_sizes() returns array([300]) with length 1
+        size = float(sizes.flat[0])
+        ff = data.float_format
+        radius_pt = np.sqrt(size / np.pi)
+        pcd.draw_options.append(f"mark size={radius_pt:{ff}}pt")
 
 
 def get_draw_options(data: TikzData, line_data: LineData) -> list[str]:

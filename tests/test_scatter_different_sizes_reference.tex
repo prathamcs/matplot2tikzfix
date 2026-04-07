@@ -19,7 +19,13 @@ ytick style={color=black}
   mark=o,
   only marks,
   scatter,
-  scatter/@pre marker code/.append style={/tikz/mark size=\perpointmarksize},
+  scatter/@post marker code/.code={%
+  \endscope
+},
+  scatter/@pre marker code/.code={%
+  \scope[draw=black, fill=none, line width=3.0pt]%
+  \pgfset{/tikz/mark size=\perpointmarksize pt}%
+},
   visualization depends on={\thisrow{sizedata} \as\perpointmarksize}
 ]
 table{%
