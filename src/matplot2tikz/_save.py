@@ -391,12 +391,24 @@ def _draw_collection(data: TikzData, child: Collection) -> list[str]:
 
 
 def _set_default_axis_dimensions_from_figure(data: TikzData, fig: Figure) -> None:
-    """Set axis width/height from figure size (in) when both unset and one non-colorbar axis."""
+    """Set axis width/height from figure size (in) when both unset and one axis.
+
+    Handles both:
+    - one non-colorbar axis (optionally with additional colorbar axes), and
+    - one colorbar-only axis.
+    """
     if data.axis_width is not None or data.axis_height is not None:
         return
-    non_cb_axes = [a for a in fig.axes if not _axes.is_colorbar_heuristic(a)]
-    if len(non_cb_axes) != 1:
+
+    # A plot with one "real" axis plus one or more colorbar axes should still
+    # use figure dimensions as defaults. Use explicit colorbar markers here to
+    # avoid heuristic false positives on regular axes (e.g., equal-image plots).
+    non_colorbar_axes = [
+        ax for ax in fig.axes if not (hasattr(ax, "_colorbar") or hasattr(ax, "_colorbar_info"))
+    ]
+    if not (len(fig.axes) == 1 or len(non_colorbar_axes) == 1):
         return
+
     data.axis_width = f"{fig.get_figwidth():{data.float_format}}in"
     data.axis_height = f"{fig.get_figheight():{data.float_format}}in"
 
@@ -470,35 +482,48 @@ def _legend_title_content(data: TikzData, obj: Axes) -> list[str]:
     ]
 
 
+def _append_sibling_legend_entries(obj: Axes, children_content: list[str]) -> None:
+    fig = obj.figure
+    if fig is None or obj != fig.axes[0]:
+        return
+
+    for other_ax in fig.axes:
+        if other_ax == obj:
+            continue
+        for child in other_ax.get_children():
+            legend_text = _util.get_legend_text(child)
+            if (
+                legend_text is not None
+                and hasattr(child, "axes")
+                and child.axes is not None
+                and child.axes.get_legend() is None
+            ):
+                plot_label = str(child.get_label()) + "_plot"
+                children_content.append(f"\\addlegendimage{{/pgfplots/refstyle={plot_label}}}\n")
+                children_content.append(f"\\addlegendentry{{{legend_text}}}\n")
+
+
 def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:
     ax = _axes.MyAxes(data, obj)
 
     if ax.is_colorbar:
-        return
+        # Standalone colorbar (figure has only this axes) is processed in MyAxes
+        fig = obj.figure
+        is_standalone = fig is not None and len(fig.axes) == 1 and fig.axes[0] is obj
+        if not is_standalone:
+            return
 
     data.current_mpl_axes = obj
 
     # Run through the child objects, gather the content.
-    children_content = _legend_title_content(data, obj) + _recurse(data, obj)
+    # For standalone colorbar, skip recursion - PGFPlots draws the colorbar from
+    # axis options alone, no \addplot needed.
+    if ax.is_colorbar:
+        children_content = []
+    else:
+        children_content = _legend_title_content(data, obj) + _recurse(data, obj)
 
-    fig = obj.figure
-    if fig is not None and obj == fig.axes[0]:
-        for other_ax in fig.axes:
-            if other_ax == obj:
-                continue
-            for child in other_ax.get_children():
-                legend_text = _util.get_legend_text(child)
-                if (
-                    legend_text is not None
-                    and hasattr(child, "axes")
-                    and child.axes is not None
-                    and child.axes.get_legend() is None
-                ):
-                    plot_label = str(child.get_label()) + "_plot"
-                    children_content.append(
-                        f"\\addlegendimage{{/pgfplots/refstyle={plot_label}}}\n"
-                    )
-                    children_content.append(f"\\addlegendentry{{{legend_text}}}\n")
+    _append_sibling_legend_entries(obj, children_content)
 
     # populate content and add axis environment if desired
     if data.add_axis_environment:
