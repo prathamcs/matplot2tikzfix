@@ -65,7 +65,7 @@ html_theme = "alabaster"
 
 html_theme_options = {
     # "logo": "meshplex-logo.svg",
-    "github_repo": "matplot2tikz",
+    "github_repo": "makintikz",
     "github_banner": True,
     "github_button": False,
 }

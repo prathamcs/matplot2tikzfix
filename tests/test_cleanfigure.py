@@ -9,7 +9,7 @@ from matplotlib.collections import PolyCollection
 from matplotlib.ticker import FormatStrFormatter, LinearLocator
 from mpl_toolkits.mplot3d import axes3d
 
-from matplot2tikz import clean_figure, get_tikz_code
+from makintikz import clean_figure, get_tikz_code
 
 mpl.use("Agg")
 

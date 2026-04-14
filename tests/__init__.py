@@ -1,1 +1,1 @@
-"""Tests for matplot2tikz library."""
+"""Tests for makintikz library."""

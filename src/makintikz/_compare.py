@@ -101,7 +101,7 @@ def compare(figure):
                 # Move result to current directory and open
                 result_pdf = temp_path / "comparison.pdf"
                 if result_pdf.exists():
-                    dest_pdf = Path.cwd() / "matplot2tikz_comparison.pdf"
+                    dest_pdf = Path.cwd() / "makintikz_comparison.pdf"
                     shutil.copy(result_pdf, dest_pdf)
                     print(f"Comparison PDF generated: {dest_pdf}")
                     webbrowser.open(str(dest_pdf))

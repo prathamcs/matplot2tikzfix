@@ -9,7 +9,7 @@ import pathlib
 
 import matplotlib.pyplot as plt
 
-import matplot2tikz as mp2t
+import makintikz as mp2t
 
 
 def _main() -> None:

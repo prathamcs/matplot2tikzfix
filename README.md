@@ -4,54 +4,54 @@
     <summary >🌐 Language</summary>
     <div>
       <div align="center">
-        <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=en">English</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=zh-CN">简体中文</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=zh-TW">繁體中文</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=ja">日本語</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=ko">한국어</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=hi">हिन्दी</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=th">ไทย</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=fr">Français</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=de">Deutsch</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=es">Español</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=it">Italiano</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=ru">Русский</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=pt">Português</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=nl">Nederlands</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=pl">Polski</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=ar">العربية</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=fa">فارسی</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=tr">Türkçe</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=vi">Tiếng Việt</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=id">Bahasa Indonesia</a>
-        | <a href="https://openaitx.github.io/view.html?user=ErwindeGelder&project=matplot2tikz&lang=as">অসমীয়া</
+        <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=AlexChrzanowski&project=makintikz&lang=as">অসমীয়া</
       </div>
     </div>
   </details>
 </div>
 
-# matplot2tikz
-The artist formerly known as <em>tikzplotlib</em>.
+# makintikz
+The artist formerly known as <em>tikzplotlib & matplot2tikz</em>.
 
-![PyPI - Version](https://img.shields.io/pypi/v/matplot2tikz)
-![GitHub License](https://img.shields.io/github/license/ErwindeGelder/matplot2tikz)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/matplot2tikz)
+![PyPI - Version](https://img.shields.io/pypi/v/makintikz)
+![GitHub License](https://img.shields.io/github/license/AlexChrzanowski/makintikz)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/makintikz)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
-[![codecov](https://codecov.io/gh/ErwindeGelder/matplot2tikz/graph/badge.svg?token=YE2VNWL9HI)](https://codecov.io/gh/ErwindeGelder/matplot2tikz)
-[![PyPI Downloads](https://static.pepy.tech/badge/matplot2tikz/month)](https://pepy.tech/projects/matplot2tikz)
+[![codecov](https://codecov.io/gh/AlexChrzanowski/makintikz/graph/badge.svg?token=YE2VNWL9HI)](https://codecov.io/gh/AlexChrzanowski/makintikz)
+[![PyPI Downloads](https://static.pepy.tech/badge/makintikz/month)](https://pepy.tech/projects/makintikz)
 
-This is matplot2tikz, a Python tool for converting matplotlib figures into
+This is makintikz, a Python tool for converting matplotlib figures into
 [PGFPlots](https://www.ctan.org/pkg/pgfplots) ([PGF/TikZ](https://www.ctan.org/pkg/pgf))
 figures like
 
-![](https://raw.githubusercontent.com/ErwindeGelder/matplot2tikz/refs/heads/main/example.png)
+![](https://raw.githubusercontent.com/AlexChrzanowski/makintikz/refs/heads/main/example.png)
 
 for native inclusion into LaTeX or ConTeXt documents.
 
-The output of matplot2tikz is in [PGFPlots](https://github.com/pgf-tikz/pgfplots/), a TeX
+The output of makintikz is in [PGFPlots](https://github.com/pgf-tikz/pgfplots/), a TeX
 library that sits on top of [PGF/TikZ](https://en.wikipedia.org/wiki/PGF/TikZ) and
-describes graphs in terms of axes, data etc. Consequently, the output of matplot2tikz
+describes graphs in terms of axes, data etc. Consequently, the output of makintikz
 
 -   retains more information,
 -   can be more easily understood, and
@@ -76,9 +76,9 @@ plt.ylabel("Voltage (mV)")
 plt.title("Simple plot $\\frac{\\alpha}{2}$")
 plt.grid(True)
 
-import matplot2tikz
+import makintikz
 
-matplot2tikz.save("test.tex")
+makintikz.save("test.tex")
 ```
 
 -->
@@ -136,11 +136,11 @@ Notably, [3D plots don't work](https://github.com/matplotlib/matplotlib/issues/7
 
 ## Installation
 
-matplot2tikz is [available from the Python Package
-Index](https://pypi.org/project/matplot2tikz/), so simply do
+makintikz is [available from the Python Package
+Index](https://pypi.org/project/makintikz/), so simply do
 
 ```
-pip install matplot2tikz
+pip install makintikz
 ```
 
 to install.
@@ -149,14 +149,14 @@ to install.
 
 1. Generate your matplotlib plot as usual.
 
-2. Instead of `pyplot.show()`, invoke matplot2tikz by
+2. Instead of `pyplot.show()`, invoke makintikz by
 
     ```python
-    import matplot2tikz
+    import makintikz
 
-    matplot2tikz.save("mytikz.tex")
+    makintikz.save("mytikz.tex")
     # or
-    matplot2tikz.save("mytikz.tex", flavor="context")
+    makintikz.save("mytikz.tex", flavor="context")
     ```
 
     to store the TikZ file as `mytikz.tex`.
@@ -196,11 +196,11 @@ to install.
     You can also get the code via:
 
     ```python
-    import matplot2tikz
+    import makintikz
 
-    matplot2tikz.Flavors.latex.preamble()
+    makintikz.Flavors.latex.preamble()
     # or
-    matplot2tikz.Flavors.context.preamble()
+    makintikz.Flavors.context.preamble()
     ```
 
 4. [Optional] Clean up the figure before exporting to tikz using the `clean_figure`
@@ -212,50 +212,50 @@ to install.
 
     # ... do your plotting
 
-    import matplot2tikz
+    import makintikz
 
-    matplot2tikz.clean_figure()
-    matplot2tikz.save("test.tex")
+    makintikz.clean_figure()
+    makintikz.save("test.tex")
     ```
 
     The command will remove points that are outside the axes limits, simplify curves and
     reduce point density for the specified target resolution.
 
-## matplot2tikz vs. tikzplotlib
+## makintikz vs. matplot2tikz vs. tikzplotlib
 
-This matplot2tikz library originated from the [tikzplotlib](https://github.com/nschloe/tikzplotlib)
+The matplot2tikz library and makintikz originated from the [tikzplotlib](https://github.com/nschloe/tikzplotlib)
 project.
 The reason a new library has been created is because tikzplotlib is no longer maintained and 
 maintainance could only be done by the single owner of the tikzplotlib library.
 If you need to use third-party code that already depends on tikzplotlib, it is suggested to change
-the tikzplotlib dependency to matplot2tikz. 
+the tikzplotlib dependency to makintikz. 
 If this is not possible, a workaround is to put the following code *before* importing the 
 third-party code:
 
    ```
    import sys
-   import matplot2tikz
-   sys.modules["tikzplotlib"] = matplot2tikz
+   import makintikz
+   sys.modules["tikzplotlib"] = makintikz
    # Do other imports, e.g., using `import my_third_party_library`
-   # If tikzplotlib is used in this library, it will automatically use matplot2tikz instead.
+   # If tikzplotlib is used in this library, it will automatically use makintikz instead.
    ```
 
 If you are updating your own scripts from tikzplotlib, you can simply use an import alias:
 
    ```python
-   import matplot2tikz as tikzplotlib
+   import makintikz as tikzplotlib
    ```
 
 ## Contributing
 
-If you experience bugs, would like to contribute, have nice examples of what matplot2tikz
+If you experience bugs, would like to contribute, have nice examples of what makintikz
 can do, or if you are just looking for more information, then please visit
-[matplot2tikz's GitHub page](https://github.com/ErwindeGelder/matplot2tikz).
+[makintikz's GitHub page](https://github.com/AlexChrzanowski/makintikz).
 
 For contributing, follow these steps:
 
 1. Download the git repository, e.g., using
-   `git clone git@github.com:ErwindeGelder/matplot2tikz.git`.
+   `git clone git@github.com:AlexChrzanowski/makintikz.git`.
 2. Create a virtual environment, e.g., using `python -m venv venv`.
 3. Activate the virtual environment (e.g., on Windows, `venv\Scripts\activate`).
 4. Install `uv` using `pip install uv` and then `tox-uv` using `uv pip install tox-uv`.
@@ -291,5 +291,5 @@ owner", let us know!
 
 ## License
 
-matplot2tikz is published under the [MIT
+makintikz is published under the [MIT
 license](https://en.wikipedia.org/wiki/MIT_License).

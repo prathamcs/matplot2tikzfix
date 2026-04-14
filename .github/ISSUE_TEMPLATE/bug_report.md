@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
  - Python version: [e.g. Python 3.11]
- - Version matplot2tikz [e.g. v0.3.1] and relevant libraries
+ - Version makintikz [e.g. v0.3.1] and relevant libraries
 - Code that results in the bug
 
 **Expected behavior**

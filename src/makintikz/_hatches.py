@@ -39,7 +39,7 @@ def __validate_hatch(hatch: str) -> str:
     """Warn about the shortcomings of patterns."""
     if len(hatch) > 1:
         warnings.warn(
-            f"matplot2tikz: Hatch '{hatch}' cannot be rendered. "
+            f"makintikz: Hatch '{hatch}' cannot be rendered. "
             "Only single character hatches are supported, e.g., "
             r"{'/', '\', '|', '-', '+', 'x', 'o', 'O', '.', '*'}. "
             f"Hatch '{hatch[0]}' will be used.",
@@ -49,7 +49,7 @@ def __validate_hatch(hatch: str) -> str:
 
     if hatch in BAD_MP_HATCH:
         warnings.warn(
-            f"matplot2tikz: The hatches {BAD_MP_HATCH} do not have good PGF counterparts.",
+            f"makintikz: The hatches {BAD_MP_HATCH} do not have good PGF counterparts.",
             stacklevel=2,
         )
     return hatch
@@ -71,7 +71,7 @@ def _mpl_hatch2pgfp_pattern(
     try:
         pgfplots_pattern = _MP_HATCH2PGF_PATTERN[hatch]
     except KeyError:
-        warnings.warn(f"matplot2tikz: The hatch {hatch} is ignored.", stacklevel=2)
+        warnings.warn(f"makintikz: The hatch {hatch} is ignored.", stacklevel=2)
         return []
 
     data.tikz_libs.add("patterns")

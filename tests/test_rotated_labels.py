@@ -9,7 +9,7 @@ import pytest
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-import matplot2tikz
+import makintikz
 
 mpl.use("Agg")
 
@@ -69,7 +69,7 @@ def test_rotated_labels_parameters(
     if y_tick_label_width:
         extra_dict.append(f"y tick label text width={y_tick_label_width}")
 
-    matplot2tikz.save(tikz_file, axis_width="7.5cm", extra_axis_parameters=extra_dict)
+    makintikz.save(tikz_file, axis_width="7.5cm", extra_axis_parameters=extra_dict)
 
     # close figure
     plt.close(fig)
@@ -102,7 +102,7 @@ def test_rotated_labels_parameters_different_values(
     if y_tick_label_width:
         extra_dict.append(f"y tick label text width={y_tick_label_width}")
 
-    matplot2tikz.save(tikz_file, axis_width="7.5cm", extra_axis_parameters=extra_dict)
+    makintikz.save(tikz_file, axis_width="7.5cm", extra_axis_parameters=extra_dict)
 
     # close figure
     plt.close(fig)
@@ -123,7 +123,7 @@ def test_rotated_labels_parameters_no_ticks() -> None:
     _, tmp_base = tempfile.mkstemp()
     tikz_file = Path(tmp_base + "_tikz.tex")
 
-    matplot2tikz.save(tikz_file, axis_width="7.5cm")
+    makintikz.save(tikz_file, axis_width="7.5cm")
 
     # close figure
     plt.close(fig)
