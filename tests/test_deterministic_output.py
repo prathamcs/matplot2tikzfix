@@ -11,13 +11,13 @@ plot_code = """
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-import matplot2tikz
+import makintikz
 
 t = np.arange(0.0, 2.0, 0.1)
 s = np.sin(2 * np.pi * t)
 plt.plot(t, s, label="a")
 plt.legend()
-matplot2tikz.save(sys.argv[1])
+makintikz.save(sys.argv[1])
 """
 
 

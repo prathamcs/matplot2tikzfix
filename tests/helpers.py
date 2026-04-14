@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.artist import Artist
 from matplotlib.text import Text
 
-import matplot2tikz
+import makintikz
 
 
 def print_tree(obj: Artist, indent: str = "") -> None:
@@ -37,7 +37,7 @@ def assert_equality(  # type: ignore[no-untyped-def]
     **extra_get_tikz_code_args,  # noqa: ANN003
 ) -> None:
     plot()
-    code = matplot2tikz.get_tikz_code(
+    code = makintikz.get_tikz_code(
         include_disclaimer=False,
         float_format=".8g",
         flavor=flavor,

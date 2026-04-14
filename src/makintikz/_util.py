@@ -1,4 +1,4 @@
-"""Several utility functions used at various parts of matplot2tikz library."""
+"""Several utility functions used at various parts of makintikz library."""
 
 from __future__ import annotations
 

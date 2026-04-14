@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.wcs import WCS
 
-import matplot2tikz
+import makintikz
 
 mpl.use("Agg")
 
@@ -36,7 +36,7 @@ def test_wcs_axes() -> None:
 
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        tikz_code = matplot2tikz.get_tikz_code()
+        tikz_code = makintikz.get_tikz_code()
 
         # Filter warnings to only check for the specific warning about unknown objects
         unknown_object_warnings = [

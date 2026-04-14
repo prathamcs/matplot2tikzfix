@@ -98,7 +98,7 @@ def get_tikz_code(  # noqa: PLR0913
 
     :param axis_width: If not ``None``, this will be used as figure width within the
                        TikZ/PGFPlots output. If ``axis_height`` is not given,
-                       ``matplot2tikz`` will try to preserve the original width/height
+                       ``makintikz`` will try to preserve the original width/height
                        ratio.  Note that ``axis_width`` can be a string literal, such as
                        ``'\\axis_width'``. If both ``axis_width`` and ``axis_height``
                        are omitted and the figure has a single (non-colorbar) axis,
@@ -108,7 +108,7 @@ def get_tikz_code(  # noqa: PLR0913
 
     :param axis_height: If not ``None``, this will be used as figure height within the
                         TikZ/PGFPlots output. If ``axis_width`` is not given,
-                        ``matplot2tikz`` will try to preserve the original width/height
+                        ``makintikz`` will try to preserve the original width/height
                         ratio.  Note that ``axis_height`` can be a string literal, such
                         as ``'\\axis_height'``. If both ``axis_width`` and
                         ``axis_height`` are omitted and the figure has a single
@@ -172,7 +172,7 @@ def get_tikz_code(  # noqa: PLR0913
     :param show_info: Show extra info on the command line. Default is ``False``.
     :type show_info: bool
 
-    :param include_disclaimer: Include matplot2tikz disclaimer in the output.
+    :param include_disclaimer: Include makintikz disclaimer in the output.
                                Set ``False`` to make tests reproducible.
                                Default is ``True``.
     :type include_disclaimer: bool
@@ -309,7 +309,7 @@ def _generate_code(data: TikzData, content: list) -> str:
     code = """"""
 
     if data.include_disclaimer:
-        disclaimer = f"This file was created with matplot2tikz v{__version__}."
+        disclaimer = f"This file was created with makintikz v{__version__}."
         code += _tex_comment(disclaimer)
 
     # write the contents
@@ -357,7 +357,7 @@ def _print_pgfplot_libs_message(data: TikzData) -> None:
 
 
 class _ContentManager:
-    """Basic Content Manager for matplot2tikz.
+    """Basic Content Manager for makintikz.
 
     This manager uses a dictionary to map z-order to an array of content
     to be drawn at the z-order.
@@ -463,7 +463,7 @@ def _recurse(data: TikzData, obj: Artist) -> list:
                     break
             else:
                 warnings.warn(
-                    f"matplot2tikz: Don't know how to handle object {type(child)}.", stacklevel=2
+                    f"makintikz: Don't know how to handle object {type(child)}.", stacklevel=2
                 )
 
     return content.flatten()
