@@ -4,9 +4,10 @@ import contextlib
 import datetime
 from collections.abc import Iterable, Sized
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from matplotlib.container import ErrorbarContainer
 from matplotlib.dates import num2date
 
 from . import _color as mycol
@@ -97,8 +98,13 @@ def draw_line2d(data: TikzData, obj: Line2D) -> list[str]:
 
 def _get_line2d_options(data: TikzData, obj: Line2D) -> list[str]:
     addplot_options = []
+    line_width: str | None
 
-    line_width = mypath.mpl_linewidth2pgfp_linewidth(data, obj.get_linewidth())
+    if _is_errorbar_main_line(obj):
+        ff = data.float_format
+        line_width = f"line width={obj.get_linewidth():{ff}}pt"
+    else:
+        line_width = mypath.mpl_linewidth2pgfp_linewidth(data, obj.get_linewidth())
     if line_width:
         addplot_options.append(line_width)
     line_xcolor = _get_linecolor_line2d(data, obj)
@@ -148,6 +154,19 @@ def _get_linecolor_line2d(data: TikzData, obj: Line2D) -> str:
     return mycol.mpl_color2xcolor(data, color)[0]
 
 
+def _is_errorbar_main_line(obj: Line2D) -> bool:
+    axes = obj.axes
+    if axes is None:
+        return False
+    for container in axes.containers:
+        if not isinstance(container, ErrorbarContainer):
+            continue
+        with contextlib.suppress(AttributeError, IndexError, TypeError):
+            if container.lines[0] is obj:
+                return True
+    return False
+
+
 def _get_drawstyle_line2d(obj: Line2D) -> str | None:
     drawstyle = obj.get_drawstyle()
     if drawstyle in [None, "default"]:
@@ -174,16 +193,34 @@ def draw_linecollection(data: TikzData, obj: LineCollection) -> list[str]:
     paths = obj.get_paths()
 
     for i, path in enumerate(paths):
-        color = edgecolors[i] if i < len(edgecolors) else edgecolors[0]
-        style = linestyles[i] if i < len(linestyles) else linestyles[0]
+        color = edgecolors[i % len(edgecolors)]
+        style = linestyles[i % len(linestyles)]
         # Ensure that if style is a tuple, that first element is a float
         if isinstance(style, tuple):
             style = (float(style[0]), style[1])
-        width = float(linewidths[i] if i < len(linewidths) else linewidths[0])
+        width = float(linewidths[i % len(linewidths)])
 
         options = mypath.get_draw_options(
             data, mypath.LineData(obj=obj, ec=color, ls=style, lw=width)
         )
+        # LineCollection linewidths are specified in points by Matplotlib.
+        # Use explicit pt values here so users get the same visual width they set,
+        # instead of the generic Line2D semantic width mapping.
+        width_keywords = {
+            "ultra thin",
+            "very thin",
+            "semithick",
+            "thick",
+            "very thick",
+            "ultra thick",
+        }
+        options = [
+            opt
+            for opt in options
+            if not opt.startswith("line width=") and opt not in width_keywords
+        ]
+        ff = data.float_format
+        options.append(f"line width={width:{ff}}pt")
 
         cont, _ = mypath.draw_path(data, path, draw_options=options, simplify=False)
         content.append(cont + "\n")
@@ -342,7 +379,7 @@ def _get_xy_data(data: TikzData, obj: Line2D) -> tuple[np.ndarray, np.ndarray]:
 
     # get_{x,y}data gives datetime or string objects if so specified in the plotter
     xdata_alt = obj.get_xdata()
-    xdata_iterable = list(xdata_alt) if isinstance(xdata_alt, Iterable) else [xdata_alt]
+    xdata_iterable: list[Any] = list(xdata_alt) if isinstance(xdata_alt, Iterable) else [xdata_alt]
 
     ff = data.float_format
 

@@ -15,6 +15,25 @@ if TYPE_CHECKING:
     from ._tikzdata import TikzData
 
 
+def _escape_unescaped_specials(text: str) -> str:
+    """Escape &, _, % unless already escaped."""
+    specials = {"&", "_", "%"}
+    out: list[str] = []
+    idx = 0
+    while idx < len(text):
+        ch = text[idx]
+        if ch == "\\" and idx + 1 < len(text) and text[idx + 1] in specials:
+            out.append("\\")
+            out.append(text[idx + 1])
+            idx += 2
+            continue
+        if ch in specials:
+            out.append("\\")
+        out.append(ch)
+        idx += 1
+    return "".join(out)
+
+
 def draw_text(data: TikzData, obj: Text) -> list[str]:
     """Paints text on the graph.
 
@@ -72,6 +91,8 @@ def draw_text(data: TikzData, obj: Text) -> list[str]:
         isinstance(weight, int) and weight > min_weight_bold
     ):
         style.append("\\bfseries")
+
+    text = _escape_unescaped_specials(text)
 
     if "\n" in text:
         # http://tex.stackexchange.com/a/124114/13262
