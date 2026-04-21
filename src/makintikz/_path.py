@@ -339,7 +339,9 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
         content.append("};\n")
 
     if path_collection_data.legend_text is not None:
-        content.append(f"\\addlegendentry{{{_common_texification(path_collection_data.legend_text)}}}\n")
+        content.append(
+            f"\\addlegendentry{{{_common_texification(path_collection_data.legend_text)}}}\n"
+        )
 
     return content
 
