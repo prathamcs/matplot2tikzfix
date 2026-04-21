@@ -29,6 +29,7 @@ from . import _image as img
 from . import _quadmesh as qmsh
 from .__about__ import __version__
 from ._tikzdata import Flavors, TikzData
+from ._util import _common_texification
 
 # Set logger to be used to print some info
 LOGGER = logging.getLogger(__name__)
@@ -478,7 +479,7 @@ def _legend_title_content(data: TikzData, obj: Axes) -> list[str]:
         return []
     return [
         "\\addlegendimage{empty legend}\n",
-        f"\\addlegendentry{{\\hspace{{{data.legend_title_hspace}}}\\textbf{{{title}}}}}\n",
+        f"\\addlegendentry{{\\hspace{{{data.legend_title_hspace}}}\\textbf{{{_common_texification(title)}}}}}\n",
     ]
 
 
@@ -500,7 +501,9 @@ def _append_sibling_legend_entries(obj: Axes, children_content: list[str]) -> No
             ):
                 plot_label = str(child.get_label()) + "_plot"
                 children_content.append(f"\\addlegendimage{{/pgfplots/refstyle={plot_label}}}\n")
-                children_content.append(f"\\addlegendentry{{{legend_text}}}\n")
+                children_content.append(
+                    f"\\addlegendentry{{{_common_texification(legend_text)}}}\n"
+                )
 
 
 def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:

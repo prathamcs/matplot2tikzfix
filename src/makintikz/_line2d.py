@@ -14,7 +14,7 @@ from . import _color as mycol
 from . import _files
 from . import _path as mypath
 from ._markers import _mpl_marker2pgfp_marker
-from ._util import get_legend_text, has_legend, transform_to_data_coordinates
+from ._util import _common_texification, get_legend_text, has_legend, transform_to_data_coordinates
 
 if TYPE_CHECKING:
     from matplotlib.collections import LineCollection
@@ -89,9 +89,9 @@ def draw_line2d(data: TikzData, obj: Line2D) -> list[str]:
     content += _table(data, obj)
 
     if legend_text is not None and primitive_legend is not None:
-        content.append(f"\\addlegendentry{{{legend_text}}}\n")
+        content.append(f"\\addlegendentry{{{_common_texification(legend_text)}}}\n")
     elif legend_text is not None and primitive_legend is None:
-        content.append(f"\\label{{{legend_text + '_plot'}}}\n")
+        content.append(f"\\label{{{_common_texification(legend_text) + '_plot'}}}\n")
 
     return content
 
