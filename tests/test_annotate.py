@@ -39,6 +39,27 @@ def plot() -> Figure:
         xytext=(50, -30),
         textcoords="offset pixels",
     )
+    ax.annotate(
+        "A & B",
+        xy=(2.0, -0.5),
+        xycoords="data",
+        xytext=(2.3, -1.0),
+        textcoords="data",
+    )
+    ax.annotate(
+        "foo_bar",
+        xy=(2.0, -1.5),
+        xycoords="data",
+        xytext=(2.3, -2.0),
+        textcoords="data",
+    )
+    ax.annotate(
+        "100%",
+        xy=(2.0, -2.5),
+        xycoords="data",
+        xytext=(2.3, -3.0),
+        textcoords="data",
+    )
     return fig
 
 

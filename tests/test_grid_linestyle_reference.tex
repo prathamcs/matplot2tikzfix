@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{navy}{RGB}{0,0,128}
+
+\begin{axis}[
+height=3in,
+tick align=outside,
+tick pos=left,
+width=5in,
+x grid style={darkgray176,dotted},
+xmajorgrids,
+xmin=-0.1, xmax=2.1,
+xtick style={color=black},
+y grid style={darkgray176,dotted},
+ymajorgrids,
+ymin=-0.1, ymax=1.1,
+ytick style={color=black}
+]
+\addplot [semithick, navy]
+table {%
+0 0
+1 1
+2 0
+};
+\end{axis}
+
+\end{tikzpicture}

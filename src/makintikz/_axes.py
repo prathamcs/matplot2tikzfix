@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable, Sized
+from collections.abc import Iterable, Sequence, Sized
+from dataclasses import dataclass
+from importlib import import_module
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
@@ -16,8 +18,111 @@ from ._util import _common_texification
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from matplotlib.lines import Line2D
 
     from ._tikzdata import TikzData
+
+
+def _first_visible_gridline(gridlines: Iterable[Line2D]) -> Line2D | None:
+    for ln in gridlines:
+        if ln.get_visible():
+            return ln
+    return None
+
+
+def _first_visible_minor_gridline(axis: object) -> Line2D | None:
+    for tick in axis.get_minor_ticks():  # type: ignore[attr-defined]
+        gl = tick.gridline
+        if gl.get_visible():
+            return gl
+    return None
+
+
+def _pgf_grid_style_brace_contents(data: TikzData, line: Line2D) -> str | None:
+    """Build comma-separated TikZ / PGFPlots style keys for a matplotlib grid Line2D."""
+    parts: list[str] = []
+    col, _ = _color.mpl_color2xcolor(data, line.get_color())
+    if col != "black":
+        parts.append(col)
+    ls_str = _mpl_linestyle2pgfplots_linestyle(data, line.get_linestyle(), line)
+    if ls_str not in (None, "solid"):
+        parts.append(str(ls_str))
+    if not parts:
+        return None
+    return ",".join(parts)
+
+
+def _mpl_linestyle2pgfplots_linestyle(
+    data: TikzData,
+    line_style: str | tuple[float, Sequence[float] | None],
+    line: Line2D | None = None,
+) -> str | None:
+    """Load linestyle converter lazily to avoid circular imports."""
+    path_module = import_module(". _path".replace(" ", ""), package=__package__)
+    converter = path_module.mpl_linestyle2pgfplots_linestyle
+    return converter(data, line_style, line)
+
+
+@dataclass
+class _AxisGridStyleSpec:
+    xy: str
+    has_major: bool
+    has_minor: bool
+    major_line: Line2D | None
+    minor_line: Line2D | None
+    orphan_style_line: Line2D | None
+
+
+def _add_axis_grid_styles(
+    data: TikzData,
+    spec: _AxisGridStyleSpec,
+) -> None:
+    """Emit `x grid style` / `y grid style` or per-major/minor styles when they differ.
+
+    When neither major nor minor grid is on, Matplotlib may still expose default `Line2D`
+    grid objects; `orphan_style_line` (historically ``lines[0]``) preserves their color /
+    linestyle in the output so PGFPlots matches prior makintikz behavior.
+    """
+    maj_brace = (
+        _pgf_grid_style_brace_contents(data, spec.major_line)
+        if spec.major_line is not None
+        else None
+    )
+    min_brace = (
+        _pgf_grid_style_brace_contents(data, spec.minor_line)
+        if spec.minor_line is not None
+        else None
+    )
+
+    split = (
+        spec.has_major
+        and spec.has_minor
+        and spec.major_line is not None
+        and spec.minor_line is not None
+        and maj_brace != min_brace
+    )
+
+    if split:
+        if maj_brace:
+            data.current_axis_options.add(
+                f"every major {spec.xy} grid/.append style={{{maj_brace}}}"
+            )
+        if min_brace:
+            data.current_axis_options.add(
+                f"every minor {spec.xy} grid/.append style={{{min_brace}}}"
+            )
+        return
+
+    if spec.has_major or spec.has_minor:
+        unified = maj_brace if spec.has_major else min_brace
+        if unified:
+            data.current_axis_options.add(f"{spec.xy} grid style={{{unified}}}")
+        return
+
+    if spec.orphan_style_line is not None:
+        orphan_brace = _pgf_grid_style_brace_contents(data, spec.orphan_style_line)
+        if orphan_brace:
+            data.current_axis_options.add(f"{spec.xy} grid style={{{orphan_brace}}}")
 
 
 class MyAxes:
@@ -254,11 +359,23 @@ class MyAxes:
             self.data.current_axis_options.add("xminorgrids")
 
         xlines = self.obj.get_xgridlines()
-        if xlines:
-            xgridcolor = xlines[0].get_color()
-            col, _ = _color.mpl_color2xcolor(self.data, xgridcolor)
-            if col != "black":
-                self.data.current_axis_options.add(f"x grid style={{{col}}}")
+        x_major_line = _first_visible_gridline(xlines) if has_major_xgrid else None
+        x_minor_line = _first_visible_minor_gridline(self.obj.xaxis) if has_minor_xgrid else None
+        x_orphan = None
+        if not has_major_xgrid and not has_minor_xgrid and xlines:
+            x_orphan = xlines[0]
+
+        _add_axis_grid_styles(
+            self.data,
+            _AxisGridStyleSpec(
+                xy="x",
+                has_major=has_major_xgrid,
+                has_minor=has_minor_xgrid,
+                major_line=x_major_line,
+                minor_line=x_minor_line,
+                orphan_style_line=x_orphan,
+            ),
+        )
 
         if has_major_ygrid:
             self.data.current_axis_options.add("ymajorgrids")
@@ -266,11 +383,23 @@ class MyAxes:
             self.data.current_axis_options.add("yminorgrids")
 
         ylines = self.obj.get_ygridlines()
-        if ylines:
-            ygridcolor = ylines[0].get_color()
-            col, _ = _color.mpl_color2xcolor(self.data, ygridcolor)
-            if col != "black":
-                self.data.current_axis_options.add(f"y grid style={{{col}}}")
+        y_major_line = _first_visible_gridline(ylines) if has_major_ygrid else None
+        y_minor_line = _first_visible_minor_gridline(self.obj.yaxis) if has_minor_ygrid else None
+        y_orphan = None
+        if not has_major_ygrid and not has_minor_ygrid and ylines:
+            y_orphan = ylines[0]
+
+        _add_axis_grid_styles(
+            self.data,
+            _AxisGridStyleSpec(
+                xy="y",
+                has_major=has_major_ygrid,
+                has_minor=has_minor_ygrid,
+                major_line=y_major_line,
+                minor_line=y_minor_line,
+                orphan_style_line=y_orphan,
+            ),
+        )
 
     def _set_axis_line_styles(self) -> None:
         # Assume that the bottom edge color is the color of the entire box.
