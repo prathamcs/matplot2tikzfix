@@ -74,7 +74,8 @@ def _patch_legend(obj: Collection | Patch, draw_options: list, legend_type: str)
         # Unfortunately, patch legend entries need \addlegendimage in Pgfplots.
         do = ", ".join([legend_type, *draw_options]) if draw_options else ""
         label = obj.get_label()
-        legend += f"\\addlegendimage{{{do}}}\n\\addlegendentry{{{_common_texification(label)}}}\n\n"
+        escaped = _common_texification(str(label))
+        legend += f"\\addlegendimage{{{do}}}\n\\addlegendentry{{{escaped}}}\n\n"
 
     return legend
 
@@ -182,7 +183,7 @@ def _draw_rectangle(data: TikzData, obj: Rectangle, draw_options: list) -> list[
         data.rectangle_legends.add(str(label))
         draw_opts = ",".join(draw_options)
         content.append(f"\\addlegendimage{{ybar,ybar legend,{draw_opts}}}\n")
-        content.append(f"\\addlegendentry{{{_common_texification(label)}}}\n\n")
+        content.append(f"\\addlegendentry{{{_common_texification(str(label))}}}\n\n")
 
     return content
 
