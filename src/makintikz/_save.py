@@ -478,7 +478,7 @@ def _legend_title_content(data: TikzData, obj: Axes) -> list[str]:
         return []
     return [
         "\\addlegendimage{empty legend}\n",
-        f"\\addlegendentry{{\\hspace{{{data.legend_title_hspace}}}\\textbf{{{title}}}}}\n",
+        f"\\addlegendentry{{\\hspace{{{data.legend_title_hspace}}}\\textbf{{{_util._common_texification(title)}}}}}\n",
     ]
 
 
@@ -500,7 +500,7 @@ def _append_sibling_legend_entries(obj: Axes, children_content: list[str]) -> No
             ):
                 plot_label = str(child.get_label()) + "_plot"
                 children_content.append(f"\\addlegendimage{{/pgfplots/refstyle={plot_label}}}\n")
-                children_content.append(f"\\addlegendentry{{{legend_text}}}\n")
+                children_content.append(f"\\addlegendentry{{{_util._common_texification(legend_text)}}}\n")
 
 
 def _process_axes(data: TikzData, obj: Axes, content: _ContentManager) -> None:

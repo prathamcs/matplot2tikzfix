@@ -22,7 +22,7 @@ from . import _color, _files
 from ._axes import _mpl_cmap2pgf_cmap
 from ._hatches import _mpl_hatch2pgfp_pattern
 from ._markers import _mpl_marker2pgfp_marker
-from ._util import get_legend_text, has_legend
+from ._util import _common_texification, get_legend_text, has_legend
 
 
 @dataclass
@@ -339,7 +339,7 @@ def draw_pathcollection(data: TikzData, obj: PathCollection) -> list[str]:
         content.append("};\n")
 
     if path_collection_data.legend_text is not None:
-        content.append(f"\\addlegendentry{{{path_collection_data.legend_text}}}\n")
+        content.append(f"\\addlegendentry{{{_common_texification(path_collection_data.legend_text)}}}\n")
 
     return content
 
