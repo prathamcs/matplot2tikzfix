@@ -262,7 +262,7 @@ def _marker_every(data: TikzData, obj: Line2D, addplot_options: list[str]) -> No
             pgf_marker = [1 + m for m in mark_every]
             addplot_options.append("mark indices = {" + ", ".join(map(str, pgf_marker)) + "}")
             if obj.axes is not None and obj.axes.get_legend() is not None:
-                data.current_axis_options.add("legend image post style={mark indices={}}")
+                data.current_axis_options.add("legend image post style={mark indices={1}}")
 
 def _marker_options(data: TikzData, marker_data: MarkerData, addplot_options: list[str]) -> None:
     mark_options = ["solid"]

@@ -28,7 +28,7 @@ def draw_patch(data: TikzData, obj: Patch) -> list[str]:
         draw_options = mypath.get_draw_options(
             data,
             mypath.LineData(
-                obj=obj,
+                    obj=obj,
                 ec=obj.get_edgecolor(),
                 fc=None,  # get_fillcolor for the arrow refers to the head, not the path
                 ls=obj.get_linestyle(),

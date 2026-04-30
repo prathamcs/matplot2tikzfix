@@ -4,9 +4,12 @@ import numpy as np
 from matplotlib.backends import backend_agg
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
+from matplotlib.patches import Patch
 
 from . import _color as mycol
+from . import _path as mypath
 from ._tikzdata import TikzData
+from ._util import _common_texification
 
 
 def draw_legend(data: TikzData, obj: Legend) -> None:
@@ -43,6 +46,7 @@ def draw_legend(data: TikzData, obj: Legend) -> None:
         ncols = obj._ncol  # type: ignore[attr-defined]  # noqa: SLF001
     if ncols != 1:
         data.current_axis_options.add(f"legend columns={ncols}")
+
 
     # Write styles to data
     if legend_style:
